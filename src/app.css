@@ -1,0 +1,30 @@
+:root {
+	--header-height: 40px;
+	--main-height: calc(100vh - var(--header-height));
+	--border-color-100: hsl(0, 0%, 90%);
+	--color-100: white;
+}
+
+*,
+*::before,
+*::after {
+	margin: 0;
+	box-sizing: border-box;
+}
+
+ul {
+	list-style: none;
+}
+
+.action-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.icon-btn {
+	inline-size: 24px;
+	block-size: 24px;
+	display: inline-grid;
+	place-content: center;
+}

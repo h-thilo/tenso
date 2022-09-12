@@ -1,0 +1,27 @@
+<script>
+	import { activeConfig, Tile } from '$lib/stores/stores';
+	import RemoveButton from '$lib/components/RemoveButton.svelte';
+
+	const addTile = () => {
+		$activeConfig.tiles = [...$activeConfig.tiles, new Tile('#000000')];
+	};
+
+	const removeTile = (i) => {
+		$activeConfig.tiles = $activeConfig.tiles.filter((tile, index) => i !== index);
+	};
+</script>
+
+<details open>
+	<summary>Tiles</summary>
+
+	<button on:click={addTile} disabled={$activeConfig.tiles.length >= 16}>Add tile</button>
+	<ul>
+		{#each $activeConfig.tiles as tile, i}
+			<li class="action-item">
+				<input type="color" bind:value={tile.color} />
+
+				<RemoveButton on:click={() => removeTile(i)} disabled={i <= 3} />
+			</li>
+		{/each}
+	</ul>
+</details>
