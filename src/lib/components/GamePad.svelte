@@ -19,8 +19,12 @@
 </script>
 
 <section>
-	<svg viewBox="{-size / 2} {-size / 2} {size} {size}" xmlns="http://www.w3.org/2000/svg" class:unclickable={!computerFinished}>
-		{#each $activeConfig.tiles as {color, isActivated}, index}
+	<svg
+		viewBox="{-size / 2} {-size / 2} {size} {size}"
+		xmlns="http://www.w3.org/2000/svg"
+		class:unclickable={!computerFinished}
+	>
+		{#each $activeConfig.tiles as { color, isActivated }, index}
 			<path
 				d="M -{x} -{y} A {r} {r} 0 0 1 {x} -{y}"
 				style:stroke={color}
@@ -42,6 +46,7 @@
 		position: relative;
 		inset: 50% auto auto 50%;
 		transform: translate(-50%, -50%);
+		padding: 1rem;
 	}
 
 	svg {
@@ -58,6 +63,6 @@
 	}
 
 	path.activated {
-		stroke: black !important;
+		stroke: var(--color-inverted) !important;
 	}
 </style>

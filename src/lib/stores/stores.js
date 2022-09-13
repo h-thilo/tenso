@@ -22,11 +22,15 @@ export const defaultTiles = [
 	new Tile('#22c55e')
 ];
 
+export let showSidebar = writable('showSidebar', false);
+
+export let selectedTheme = writable('selectedTheme', 'System');
+
 export const defaultSettings = {
 	Sound: new Setting([true, false], true),
-	Speed: new Setting([800, 600, 400], 600),
-	'Tile size': new Setting([20, 40, 80], 40),
-	'Tile gap': new Setting([0, 5, 10, 20], 10)
+	Speed: new Setting(['Slow', 'Medium', 'Fast'], 'Slow'),
+	'Tile size': new Setting([20, 80], 40),
+	'Tile gap': new Setting([0, 20], 10)
 };
 
 export let configs = writable('configs', [

@@ -1,75 +1,167 @@
 <script>
-    import { activeConfig } from '$lib/stores/stores';
-    export let computerFinished = false;
+	import { activeConfig } from '$lib/stores/stores';
+	import { supabase } from '$lib/supabaseClient';
+	import { gameStarted } from '$lib/stores/game';
+	export let computerFinished = false;
 
-    let gameStarted = false;
-    let computerSequence = [];
-    $: remainingClicks = computerSequence.length - userSequence.length;
-    let score = 0;
-    let userSequence = [];
+	let computerSequence = [];
+	$: remainingClicks = computerSequence.length - userSequence.length;
+	let reachedRounds = 0;
+	let scoreSpeedMultiplier;
+	let score = 0;
+	let finalScore;
+	let userSequence = [];
+	let osc;
 
-    const startGame = () => {
-        gameStarted = true;
-        startRound();
-    }
+	const startGame = () => {
+		$gameStarted = true;
+		startRound();
+	};
 
-    const startRound = () => {
-        let color = $activeConfig.tiles[Math.floor(Math.random() * $activeConfig.tiles.length)].color;
-        let id = $activeConfig.tiles.findIndex(tile => color === tile.color);
+	const getGameSpeed = () => {
+		switch ($activeConfig.settings.Speed.selected) {
+			case 'Slow':
+				scoreSpeedMultiplier = 1;
+				return 800;
+			case 'Medium':
+				scoreSpeedMultiplier = 2;
+				return 600;
+			case 'Fast':
+				scoreSpeedMultiplier = 3;
+				return 400;
+		}
+	};
 
-        computerSequence = [...computerSequence, id];
+	const startRound = () => {
+		let color = $activeConfig.tiles[Math.floor(Math.random() * $activeConfig.tiles.length)].color;
+		let id = $activeConfig.tiles.findIndex((tile) => color === tile.color);
 
-        computerSequence.forEach((entry, index) => {
-            setTimeout(() => {
-                activateTile(entry, $activeConfig.settings.Speed.selected / 2);
-            }, ++index * $activeConfig.settings.Speed.selected)
-        })
+		computerSequence = [...computerSequence, id];
 
-        setTimeout(() => {
-            computerFinished = true;
-        }, computerSequence.length * $activeConfig.settings.Speed.selected + $activeConfig.settings.Speed.selected);
-    }
+		computerSequence.forEach((entry, index) => {
+			setTimeout(() => {
+				activateTile(entry, getGameSpeed() / 2);
+			}, ++index * getGameSpeed());
+		});
 
-    export const userClick = (i) => {
-        userSequence = [...userSequence, i];
-        const lastItem = userSequence.length - 1;
+		setTimeout(() => {
+			computerFinished = true;
+		}, computerSequence.length * getGameSpeed() + getGameSpeed());
+	};
 
-        activateTile(i, 100);
+	const tileShortcuts = (event) => {
+		if (computerFinished && $gameStarted) {
+			switch (event.key) {
+				case 'w':
+					userClick(0);
+					break;
+				case 'a':
+					userClick(3);
+					break;
+				case 's':
+					userClick(2);
+					break;
+				case 'd':
+					userClick(1);
+					break;
+			}
+		}
+	};
 
-        if (computerSequence[lastItem] !== userSequence[lastItem]) {
-            gameStarted = false;
-            computerSequence = [];
-            computerFinished = false;
-            score = 0;
-            userSequence = [];
+	const insertDBRow = async (name, score, speed, rounds_reached, tiles) => {
+		const { data, error } = await supabase
+			.from('leaderboard')
+			.insert([{ name, score, speed, rounds_reached, tiles }]);
+	};
 
-            alert('Game over!');
+	export const userClick = (i) => {
+		userSequence = [...userSequence, i];
+		const lastItem = userSequence.length - 1;
 
-            return;
-        }
+		activateTile(i, 100);
 
-        if (computerSequence.length === userSequence.length) {
-            ++score;
-            userSequence = [];
-            computerFinished = false;
-            
-            setTimeout(() => startRound(), $activeConfig.settings.Speed.selected);
-        }
-    }
+		if (computerSequence[lastItem] !== userSequence[lastItem]) {
+			$gameStarted = false;
+			computerSequence = [];
+			computerFinished = false;
+			finalScore = score;
+			score = 0;
+			userSequence = [];
+			osc.stop();
 
-    const activateTile = (id, timeout) => {
-        $activeConfig.tiles[id].isActivated = true;
-        setTimeout(() => $activeConfig.tiles[id].isActivated = false, timeout);
-    }
+			alert(`Game over!\nFinal score: ${finalScore}`);
+
+			if (reachedRounds >= 5) {
+				let name = '';
+
+				while (name === '') {
+					name = prompt(
+						'Enter your name to add your score to the leaderboard: (Needs to be at least two characters long)'
+					);
+				}
+
+				if (name)
+					insertDBRow(
+						name,
+						finalScore,
+						$activeConfig.settings.Speed.selected,
+						reachedRounds,
+						$activeConfig.tiles.length
+					);
+			}
+
+			reachedRounds = 0;
+
+			return;
+		}
+
+		if (computerSequence.length === userSequence.length) {
+			++reachedRounds;
+			score = scoreSpeedMultiplier * $activeConfig.tiles.length * reachedRounds;
+			userSequence = [];
+			computerFinished = false;
+
+			setTimeout(() => startRound(), getGameSpeed());
+		}
+	};
+
+	const activateTile = (id, timeout) => {
+		$activeConfig.tiles[id].isActivated = true;
+		if ($activeConfig.settings.Sound.selected) playSound(id);
+		setTimeout(() => ($activeConfig.tiles[id].isActivated = false), timeout);
+	};
+
+	const playSound = (id) => {
+		const ctx = new AudioContext();
+		osc = ctx.createOscillator();
+		const vol = ctx.createGain();
+
+		osc.type = 'sine';
+		osc.frequency.value = 220 + id * 20;
+		vol.gain.value = 0.1;
+
+		osc.connect(vol);
+		vol.connect(ctx.destination);
+
+		osc.start(0);
+		setTimeout(() => osc.stop(), 100);
+	};
 </script>
 
+<svelte:window on:keydown={tileShortcuts} />
+
 <section>
-    {#if gameStarted}
-        <h1>Score: {score}</h1>
-        <p>{@html computerFinished ? `Your turn...<br>Clicks left: ${remainingClicks}` : 'Wait for the computer...'}</p>
-    {:else}
-        <button on:click={startGame}>Start</button>
-    {/if}
+	{#if $gameStarted}
+		<p>Score</p>
+		<h1>{score}</h1>
+		<p>
+			{@html computerFinished
+				? `Your turn...<br>Clicks left: ${remainingClicks}`
+				: 'Wait for the computer...'}
+		</p>
+	{:else}
+		<button on:click={startGame}>Start</button>
+	{/if}
 </section>
 
 <style>
@@ -78,6 +170,6 @@
 		inset: 50% auto auto 50%;
 		transform: translate(-50%, -50%);
 		text-align: center;
-        user-select: none;
+		user-select: none;
 	}
 </style>

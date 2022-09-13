@@ -1,8 +1,6 @@
 :root {
 	--header-height: 40px;
 	--main-height: calc(100vh - var(--header-height));
-	--border-color-100: hsl(0, 0%, 90%);
-	--color-100: white;
 }
 
 *,
@@ -14,6 +12,11 @@
 
 ul {
 	list-style: none;
+	padding: 0;
+}
+
+summary {
+	user-select: none;
 }
 
 .action-item {

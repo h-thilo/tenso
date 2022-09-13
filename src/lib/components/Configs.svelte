@@ -10,14 +10,20 @@
 
 	let newConfigName;
 	const addConfig = () => {
-		$configs = [
-			...$configs,
-			{
-				name: newConfigName,
-				tiles: JSON.parse(JSON.stringify(defaultTiles)),
-				settings: JSON.parse(JSON.stringify(defaultSettings))
-			}
-		];
+		const nameIsDuplicate = $configs.findIndex((config) => config.name === newConfigName) !== -1;
+
+		if (nameIsDuplicate) {
+			alert('That config name already exists. Try another one.');
+		} else {
+			$configs = [
+				...$configs,
+				{
+					name: newConfigName,
+					tiles: JSON.parse(JSON.stringify(defaultTiles)),
+					settings: JSON.parse(JSON.stringify(defaultSettings))
+				}
+			];
+		}
 
 		newConfigName = '';
 	};
@@ -33,7 +39,10 @@
 	<summary>Configs (<strong>{$activeConfig.name}</strong>)</summary>
 
 	<form on:submit|preventDefault={addConfig}>
-		<input type="text" bind:value={newConfigName} minlength="2" maxlength="20" required />
+		<label>
+			New config:
+			<input type="text" bind:value={newConfigName} minlength="2" maxlength="20" required />
+		</label>
 
 		<button> Add config </button>
 	</form>

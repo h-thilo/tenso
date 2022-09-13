@@ -1,0 +1,19 @@
+@media (prefers-color-scheme: dark) {
+	:root {
+		--border-color-100: hsl(0, 0%, 20%);
+		--color-100: hsl(0, 0%, 10%);
+		--color-200: hsl(0, 0%, 15%);
+
+		--color-inverted: white;
+	}
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--border-color-100: hsl(0, 0%, 90%);
+		--color-100: white;
+		--color-200: hsl(0, 0%, 95%);
+
+		--color-inverted: hsl(0, 0%, 15%);
+	}
+}

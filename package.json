@@ -19,6 +19,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@supabase/supabase-js": "^1.35.6",
 		"svelte-local-storage-store": "^0.3.1"
 	}
 }
