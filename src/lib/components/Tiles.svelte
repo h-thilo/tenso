@@ -2,8 +2,12 @@
 	import { activeConfig, Tile } from '$lib/stores/stores';
 	import RemoveButton from '$lib/components/RemoveButton.svelte';
 
+	const genRanHex = (size) => {
+		return '#' + [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+	};
+
 	const addTile = () => {
-		$activeConfig.tiles = [...$activeConfig.tiles, new Tile('#000000')];
+		$activeConfig.tiles = [...$activeConfig.tiles, new Tile(genRanHex(6))];
 	};
 
 	const removeTile = (i) => {

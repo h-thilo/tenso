@@ -1,4 +1,5 @@
 import { writable } from 'svelte-local-storage-store';
+import { writable as svelteWritable } from 'svelte/store';
 import { derived, get } from 'svelte/store';
 
 export class Tile {
@@ -22,7 +23,7 @@ export const defaultTiles = [
 	new Tile('#22c55e')
 ];
 
-export let showSidebar = writable('showSidebar', false);
+export let showSidebar = svelteWritable(false);
 
 export let selectedTheme = writable('selectedTheme', 'System');
 
@@ -59,3 +60,7 @@ const activeConfigStore = () => {
 	};
 };
 export let activeConfig = activeConfigStore();
+
+export let gameStarted = svelteWritable(false);
+
+export let itemsPerPage = writable('itemsPerPage', 3);

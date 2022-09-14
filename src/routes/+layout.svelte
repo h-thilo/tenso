@@ -30,6 +30,11 @@
 		align-items: center;
 		border: 1px solid var(--border-color-100);
 		background-color: var(--color-200);
+		padding-inline: 1rem;
+	}
+
+	button {
+		margin-inline-start: 0.5rem;
 	}
 
 	main {

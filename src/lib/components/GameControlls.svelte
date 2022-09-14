@@ -1,7 +1,6 @@
 <script>
-	import { activeConfig } from '$lib/stores/stores';
+	import { activeConfig, gameStarted } from '$lib/stores/stores';
 	import { supabase } from '$lib/supabaseClient';
-	import { gameStarted } from '$lib/stores/game';
 	export let computerFinished = false;
 
 	let computerSequence = [];

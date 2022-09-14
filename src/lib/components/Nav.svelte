@@ -24,9 +24,15 @@
 
 	ul {
 		display: flex;
+		gap: 0.5rem;
+	}
+
+	a {
+		text-decoration: none;
+		color: inherit;
 	}
 
 	.activated {
-		background-color: lightyellow;
+		text-decoration: underline;
 	}
 </style>
