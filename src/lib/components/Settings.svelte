@@ -1,5 +1,5 @@
 <script>
-	import { activeConfig } from '$lib/stores/stores';
+	import { activeConfig, gameStarted } from '$lib/stores/stores';
 </script>
 
 <details open>
@@ -28,6 +28,7 @@
 							name={setting}
 							id={setting}
 							bind:value={$activeConfig.settings[setting].selected}
+							disabled={setting === 'Speed' && $gameStarted}
 						>
 							{#each value.options as option}
 								<option value={option}>{option}</option>

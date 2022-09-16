@@ -3,6 +3,8 @@
 	import { supabase } from '$lib/supabaseClient';
 	export let computerFinished = false;
 
+	let tiles;
+	let gameSpeed;
 	let computerSequence = [];
 	$: remainingClicks = computerSequence.length - userSequence.length;
 	let reachedRounds = 0;
@@ -14,6 +16,9 @@
 
 	const startGame = () => {
 		$gameStarted = true;
+		tiles = $activeConfig.tiles;
+		gameSpeed = getGameSpeed();
+
 		startRound();
 	};
 
@@ -32,20 +37,20 @@
 	};
 
 	const startRound = () => {
-		let color = $activeConfig.tiles[Math.floor(Math.random() * $activeConfig.tiles.length)].color;
-		let id = $activeConfig.tiles.findIndex((tile) => color === tile.color);
+		let color = tiles[Math.floor(Math.random() * tiles.length)].color;
+		let id = tiles.findIndex((tile) => color === tile.color);
 
 		computerSequence = [...computerSequence, id];
 
 		computerSequence.forEach((entry, index) => {
 			setTimeout(() => {
-				activateTile(entry, getGameSpeed() / 2);
-			}, ++index * getGameSpeed());
+				activateTile(entry, gameSpeed / 2);
+			}, ++index * gameSpeed);
 		});
 
 		setTimeout(() => {
 			computerFinished = true;
-		}, computerSequence.length * getGameSpeed() + getGameSpeed());
+		}, computerSequence.length * gameSpeed + gameSpeed);
 	};
 
 	const tileShortcuts = (event) => {
@@ -105,7 +110,7 @@
 						finalScore,
 						$activeConfig.settings.Speed.selected,
 						reachedRounds,
-						$activeConfig.tiles.length
+						tiles.length
 					);
 			}
 
@@ -116,11 +121,11 @@
 
 		if (computerSequence.length === userSequence.length) {
 			++reachedRounds;
-			score = scoreSpeedMultiplier * $activeConfig.tiles.length * reachedRounds;
+			score = scoreSpeedMultiplier * tiles.length * reachedRounds;
 			userSequence = [];
 			computerFinished = false;
 
-			setTimeout(() => startRound(), getGameSpeed());
+			setTimeout(() => startRound(), gameSpeed);
 		}
 	};
 

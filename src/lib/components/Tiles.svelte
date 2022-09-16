@@ -1,5 +1,5 @@
 <script>
-	import { activeConfig, Tile } from '$lib/stores/stores';
+	import { activeConfig, Tile, gameStarted } from '$lib/stores/stores';
 	import RemoveButton from '$lib/components/RemoveButton.svelte';
 
 	const genRanHex = (size) => {
@@ -18,7 +18,9 @@
 <details open>
 	<summary>Tiles</summary>
 
-	<button on:click={addTile} disabled={$activeConfig.tiles.length >= 16}>Add tile</button>
+	<button on:click={addTile} disabled={$activeConfig.tiles.length >= 16 || $gameStarted}
+		>Add tile</button
+	>
 	<ul>
 		{#each $activeConfig.tiles as tile, i}
 			<li class="action-item">
